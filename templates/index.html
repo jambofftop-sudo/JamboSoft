@@ -3,193 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZHAKE BRAINROT | WINTER</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
+    <title>ZHAKE BRAINROT</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
-        :root { --accent: #00d4ff; --bg: #000814; }
-        * { font-family: 'Inter', sans-serif !important; font-weight: 900 !important; text-transform: uppercase; }
-        body { background: var(--bg); color: white; margin: 0; overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        
-        .snowflake { position: fixed; top: -10px; color: white; font-size: 1rem; z-index: 1000; pointer-events: none; animation: fall linear forwards; }
-        @keyframes fall { to { transform: translateY(105vh) translateX(20px); } }
-
-        .floor { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; background-image: linear-gradient(to right, rgba(0, 212, 255, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 212, 255, 0.1) 1px, transparent 1px); background-size: 60px 60px; transform: perspective(500px) rotateX(60deg); transform-origin: top; border-top: 5px solid var(--accent); z-index: 1; }
-        .game-world { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
-        .animal { position: absolute; bottom: 12vh; font-size: 120px; filter: drop-shadow(0 0 15px var(--accent)); will-change: transform; }
-
-        .ui { position: relative; z-index: 100; text-align: center; }
-        .title-neon { font-size: 3rem; text-shadow: 0 0 20px var(--accent); margin-bottom: 20px; }
-        
-        .btn { width: 340px; padding: 22px; margin: 10px; background: rgba(0, 8, 20, 0.9); border: 4px solid var(--accent); color: white; font-size: 1.2rem; cursor: pointer; border-radius: 20px; transition: 0.2s; box-shadow: 0 5px 0 var(--accent); }
-        .btn:hover { background: var(--accent); color: black; transform: translateY(-3px); box-shadow: 0 8px 25px var(--accent); }
-        
-        .form-container { background: rgba(0, 15, 30, 0.98); border: 4px solid var(--accent); padding: 25px; border-radius: 25px; width: 380px; box-shadow: 0 0 40px rgba(0, 212, 255, 0.2); }
-        .input-group { display: flex; align-items: center; margin: 12px 0; border: 3px solid var(--accent); background: #000; border-radius: 12px; overflow: hidden; }
-        .icon-box { padding: 0 15px; font-size: 1.3rem; background: rgba(0, 212, 255, 0.1); border-right: 2px solid var(--accent); display: flex; align-items: center; }
-        
-        input, select { padding: 15px; background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 1.1rem; }
-        select { background: var(--accent); color: black; width: 85px; }
-
-        .flag-btn { width: 140px; height: 90px; cursor: pointer; border: 4px solid #1a1a1a; border-radius: 15px; margin: 10px; transition: 0.3s; }
-        .flag-btn:hover { border-color: var(--accent); transform: scale(1.05); }
-
-        .my-item-card { background: #001220; border: 2px solid var(--accent); padding: 15px; margin: 10px 0; border-radius: 15px; text-align: left; }
-        .hidden { display: none !important; }
-        label { display: block; text-align: left; color: var(--accent); font-size: 0.7rem; margin-bottom: 3px; margin-left: 5px; }
+        body { font-family: 'Arial Black', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #000; color: #fff; overflow: hidden; font-weight: 900; }
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('/static/bg.jpg') center/cover no-repeat; opacity: 0.7; z-index: -1; }
+        .main-card { background: rgba(0, 0, 0, 0.75); padding: 35px; border-radius: 35px; width: 90%; max-width: 450px; border: 3px solid #FFDE00; text-align: center; backdrop-filter: blur(15px); }
+        .btn { background: rgba(15,15,15,0.9); color: #fff; border: 3px solid #FFDE00; padding: 18px; border-radius: 12px; width: 100%; margin-bottom: 15px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; font-size: 18px; }
+        .btn:hover { background: #FFDE00; color: #000; }
+        #subB { background: #FFDE00; color: #000; border: none; }
+        .label { color: #FFDE00; font-size: 13px; text-align: left; display: block; margin: 15px 0 5px 10px; text-transform: uppercase; }
+        .input-group { display: flex; align-items: center; background: rgba(0,0,0,0.8); border: 2px solid #FFDE00; border-radius: 12px; margin-bottom: 15px; padding: 5px 15px; }
+        .input-group input { background: transparent; border: none; color: #fff; padding: 10px; width: 100%; outline: none; font-size: 18px; font-weight: 900; }
+        .screen { display: none; }
+        .active { display: block; }
+        .timer-box { font-size: 60px; color: #FFDE00; margin: 10px 0; }
+        .timer-desc { font-size: 14px; color: #ccc; margin-bottom: 20px; line-height: 1.4; }
+        .back-link { color: #FFDE00; cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; }
     </style>
 </head>
-<body>
-
-    <div class="floor"></div>
-    <div class="game-world" id="world"></div>
-    <div id="snow-container"></div>
-
-    <div id="lang-overlay" style="position:fixed; z-index:10000; background:var(--bg); inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <h1 class="title-neon">ЯЗЫК / ТІЛ</h1>
-        <div>
-            <img src="https://flagcdn.com/w320/kz.png" class="flag-btn" onclick="startApp('kz')">
-            <img src="https://flagcdn.com/w320/ru.png" class="flag-btn" onclick="startApp('ru')">
-        </div>
+<body onload="checkStatus()">
+<div class="bg-overlay"></div>
+<div class="main-card">
+    <div id="s1" class="screen active">
+        <h2>ВЫБЕРИТЕ ЯЗЫК</h2>
+        <button class="btn" onclick="setL('ru')">РУССКИЙ</button>
+        <button class="btn" onclick="setL('kz')">КАЗАКША</button>
     </div>
-
-    <div class="ui">
-        <div id="main-menu" class="hidden">
-            <h1 class="title-neon" id="m-title">ZHAKE MARKET</h1>
-            <button class="btn" id="btn-sell" onclick="showPage('form-page')">ПРОДАТЬ БРЕЙНРОТ</button><br>
-            <button class="btn" id="btn-mine" onclick="showMyItems()">МОИ ТОВАРЫ</button><br>
-            <button class="btn" onclick="window.open('https://t.me/zhakebreinrot')">КАНАЛ</button>
-        </div>
-
-        <div id="form-page" class="hidden">
-            <div class="form-container">
-                <h2 id="f-h2" style="margin:0 0 15px 0">ПРОДАЖА БРЕЙНРОТОВ</h2>
-                <form id="anketaForm">
-                    <label id="l-inc">ПРИБЫЛЬ БРЕЙНРОТА В СЕКУНДУ:</label>
-                    <div class="input-group">
-                        <div class="icon-box">🪙</div>
-                        <input type="number" id="v_inc" min="1" max="999" placeholder="100" required>
-                        <select id="s_inc"><option>M</option><option>B</option><option>T</option><option>Q</option></select>
-                    </div>
-                    <label id="l-pri">ЦЕНА БРЕЙНРОТА:</label>
-                    <div class="input-group">
-                        <div class="icon-box">💵</div>
-                        <input type="number" id="v_pri" placeholder="5000" required>
-                        <select id="s_pri"><option>₸</option><option>₽</option></select>
-                    </div>
-                    <label id="l-wa">WHATSAPP НОМЕР:</label>
-                    <div class="input-group">
-                        <div class="icon-box">📱</div>
-                        <input type="text" id="v_wa" placeholder="77071234567" required>
-                    </div>
-                    <label id="l-ph">ФОТО БРЕЙНРОТА:</label>
-                    <div class="input-group">
-                        <div class="icon-box">💎</div>
-                        <input type="file" id="v_ph" accept="image/*" required style="font-size:0.7rem">
-                    </div>
-                    <button type="submit" class="btn" id="btn-sub" style="width:100%; margin-top:10px">ОТПРАВИТЬ</button>
-                </form>
-                <div style="cursor:pointer; margin-top:15px; color:#555" onclick="showPage('main-menu')">← НАЗАД</div>
-            </div>
-        </div>
-
-        <div id="items-page" class="hidden">
-            <div class="form-container">
-                <h2>ВАШИ АНКЕТЫ</h2>
-                <div id="items-container" style="max-height:300px; overflow-y:auto;"></div>
-                <button class="btn" style="width:100%; margin-top:15px;" onclick="showPage('main-menu')">НАЗАД</button>
-            </div>
-        </div>
+    <div id="s2" class="screen">
+        <h2 id="mTitle">ZHAKE BRAINROT</h2>
+        <button class="btn" id="sellBtn" onclick="openSell()">🐯 ПРОДАТЬ БРЕЙНРОТ</button>
+        <button class="btn" onclick="window.open('https://t.me/zhakebreinrot')">НАШ КАНАЛ 🚀</button>
     </div>
+    <div id="s3" class="screen">
+        <h2 id="formTitle">ПРОДАЖА</h2>
+        <form id="ankForm">
+            <input type="hidden" name="sid" id="userSid">
+            <span class="label" id="lab1">Заработок в сек (1-9999):</span>
+            <div class="input-group">🪐 <input type="number" name="profit" min="1" max="9999" required></div>
+            <span class="label" id="lab2">Цена (Тенге):</span>
+            <div class="input-group">💰 <input type="number" name="price" required></div>
+            <span class="label" id="lab3">WhatsApp:</span>
+            <div class="input-group">📱 <input type="text" name="phone" placeholder="7707..." required></div>
+            <span class="label" id="lab4">Фото (Обязательно):</span>
+            <div class="input-group">🖼️ <input type="file" name="photo" accept="image/*" required style="font-size: 12px; color:#888;"></div>
+            <button type="button" class="btn" id="subB" onclick="submitAnketa()">ОТПРАВИТЬ</button>
+        </form>
+        <div class="back-link" onclick="go('s2')">Назад</div>
+    </div>
+    <div id="sWait" class="screen">
+        <h2 id="wT">ПОДОЖДИТЕ</h2>
+        <p class="timer-desc" id="tDesc">Ваша анкета проверяется администратором, в скором времени она появится на канале.</p>
+        <div class="timer-box" id="timer">05:00</div>
+        <div class="back-link" onclick="go('s2')">Назад в меню</div>
+    </div>
+</div>
 
-    <script>
-        function createSnowflake() {
-            const snow = document.createElement('div');
-            snow.className = 'snowflake'; snow.innerHTML = '❄';
-            snow.style.left = Math.random() * 100 + 'vw';
-            const duration = Math.random() * 3 + 2;
-            snow.style.animationDuration = duration + 's';
-            document.getElementById('snow-container').appendChild(snow);
-            setTimeout(() => snow.remove(), duration * 1000);
+<script>
+    let L = 'ru';
+    const socket = io();
+    socket.on('connect', () => { document.getElementById('userSid').value = socket.id; });
+
+    socket.on('anketa_accepted', (data) => {
+        alert(data.msg);
+        if(confirm("Посмотреть мой лот в канале?")) { window.open(data.link); }
+    });
+
+    function go(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    
+    async function checkStatus(){
+        const res = await fetch('/check_timer');
+        const data = await res.json();
+        if(data.status === 'wait') { startTimer(data.remaining); }
+    }
+
+    function openSell() {
+        fetch('/check_timer').then(r => r.json()).then(data => {
+            if(data.status === 'wait') { go('sWait'); } else { go('s3'); }
+        });
+    }
+
+    function setL(lang){
+        L = lang;
+        if(lang==='kz'){
+            document.getElementById('mTitle').innerText='ЖАКЕ БРЕЙНРОТ';
+            document.getElementById('sellBtn').innerText='🐯 БРЕЙНРОТ САТУ';
+            document.getElementById('wT').innerText='КУТИНЫЗ';
+            document.getElementById('tDesc').innerText='Сиздин анкетаныз тексеруде, тез арада каналда пайда болады.';
+        } else {
+            document.getElementById('wT').innerText='ПОДОЖДИТЕ';
+            document.getElementById('tDesc').innerText='Ваша анкета проверяется администратором, в скором времени она появится на канале.';
         }
-        setInterval(createSnowflake, 150);
+        go('s2');
+    }
 
-        const animals = ['🐊', '🐱', '🐕', '🦖', '🐸'];
-        function spawn() {
-            const a = document.createElement('div'); a.className = 'animal';
-            a.innerText = animals[Math.floor(Math.random()*animals.length)];
-            a.style.left = '-200px'; document.getElementById('world').appendChild(a);
-            let pos = -200;
-            function walk() {
-                pos += 2.5; a.style.left = pos + 'px';
-                a.style.bottom = (12 + Math.sin(Date.now()*0.01)*3) + 'vh';
-                if(pos < window.innerWidth + 200) requestAnimationFrame(walk); else a.remove();
-            }
-            walk();
-        }
-        setInterval(spawn, 3500);
+    async function submitAnketa(){
+        const form = document.getElementById('ankForm');
+        if(!form.checkValidity()) { alert(L==='ru'?'Заполните все поля и выберите фото!':'Барлык жерди толтырып, фото танданыз!'); return; }
+        
+        const b = document.getElementById('subB');
+        const fd = new FormData(form);
+        b.disabled = true;
 
-        const trans = {
-            ru: { title: "ZHAKE MARKET", sell: "ПРОДАТЬ БРЕЙНРОТ", mine: "МОИ ТОВАРЫ", h2: "ПРОДАЖА БРЕЙНРОТОВ", inc: "ПРИБЫЛЬ В СЕКУНДУ:", pri: "ЦЕНА БРЕЙНРОТА:", wa: "WHATSAPP НОМЕР:", sub: "ОТПРАВИТЬ" },
-            kz: { title: "ЖАКЕ МАРКЕТ", sell: "БРЕЙНРОТ САТУ", mine: "МЕНІҢ ТАУАРЛАРЫМ", h2: "БРЕЙНРОТ САТУ", inc: "СЕКУНДЫНА ПАЙДА:", pri: "БРЕЙНРОТ БАҒАСЫ:", wa: "WHATSAPP НӨМІРІ:", sub: "ЖІБЕРУ" }
-        };
+        const res = await fetch('/send_anketa', { method: 'POST', body: fd });
+        if (res.ok) { startTimer(300); go('sWait'); }
+        else { const data = await res.json(); if(data.status === 'wait') { startTimer(data.remaining); go('sWait'); } }
+        b.disabled = false;
+    }
 
-        function startApp(l) {
-            document.getElementById('m-title').innerText = trans[l].title;
-            document.getElementById('btn-sell').innerText = trans[l].sell;
-            document.getElementById('btn-mine').innerText = trans[l].mine;
-            document.getElementById('f-h2').innerText = trans[l].h2;
-            document.getElementById('l-inc').innerText = trans[l].inc;
-            document.getElementById('l-pri').innerText = trans[l].pri;
-            document.getElementById('l-wa').innerText = trans[l].wa;
-            document.getElementById('btn-sub').innerText = trans[l].sub;
-            document.getElementById('lang-overlay').classList.add('hidden');
-            document.getElementById('main-menu').classList.remove('hidden');
-        }
-
-        function showPage(id) {
-            ['main-menu', 'form-page', 'items-page'].forEach(p => document.getElementById(p).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function showMyItems() {
-            const cont = document.getElementById('items-container');
-            cont.innerHTML = '';
-            let myData = JSON.parse(localStorage.getItem('my_data') || "[]");
-            myData.forEach(item => {
-                cont.innerHTML += `<div class="my-item-card">
-                    <div style="color:var(--accent)">ЛОТ #${item.id}</div>
-                    <div>+${item.inc}${item.sym}/СЕК | ${item.pri}${item.cur}</div>
-                    <div style="color:#0f0; font-size:0.8rem">ОПУБЛИКОВАН</div>
-                </div>`;
-            });
-            showPage('items-page');
-        }
-
-        document.getElementById('anketaForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const fd = new FormData();
-            const v_inc = document.getElementById('v_inc').value;
-            const s_inc = document.getElementById('s_inc').value;
-            const v_pri = document.getElementById('v_pri').value;
-            const s_pri = document.getElementById('s_pri').value;
-
-            fd.append('money_val', v_inc); fd.append('money_sym', s_inc);
-            fd.append('price_val', v_pri); fd.append('price_cur', s_pri);
-            fd.append('whatsapp', document.getElementById('v_wa').value);
-            fd.append('photo', document.getElementById('v_ph').files[0]);
-
-            const res = await fetch('/send_anketa', { method: 'POST', body: fd });
-            const data = await res.json();
-            if(data.status === "success") {
-                let myData = JSON.parse(localStorage.getItem('my_data') || "[]");
-                myData.push({ id: data.id, inc: v_inc, sym: s_inc, pri: v_pri, cur: s_pri });
-                localStorage.setItem('my_data', JSON.stringify(myData));
-                alert("ОТПРАВЛЕНО!");
-                showPage('main-menu');
-            } else {
-                alert("ОШИБКА: " + data.message);
-            }
-        };
-    </script>
+    function startTimer(sec) {
+        const display = document.getElementById('timer');
+        let t = sec;
+        const interval = setInterval(() => {
+            let m = Math.floor(t / 60); let s = t % 60;
+            display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+            if (--t < 0) { clearInterval(interval); location.reload(); }
+        }, 1000);
+    }
+</script>
 </body>
 </html>
